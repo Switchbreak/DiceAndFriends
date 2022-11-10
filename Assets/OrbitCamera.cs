@@ -16,10 +16,13 @@ public class OrbitCamera : MonoBehaviour
 
     Vector3 up = new(0, 1, 0);
     Vector3 mousePosition;
+    int layerMask;
 
     // Start is called before the first frame update
     void Start()
     {
+        layerMask = LayerMask.GetMask("Default", "UI");
+
         this.transform.LookAt(lookAt);
         mousePosition = Input.mousePosition;
     }
@@ -29,14 +32,19 @@ public class OrbitCamera : MonoBehaviour
     {
         if (Input.GetMouseButton(LEFT_MOUSE_BUTTON))
         {
-            var drag = Input.mousePosition - mousePosition;
+            var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
-            var dragX = Mathf.Clamp(drag.x, -DRAG_CLAMP, DRAG_CLAMP);
-            var dragY = -Mathf.Clamp(drag.y, -DRAG_CLAMP, DRAG_CLAMP);
+            if (!Physics.Raycast(ray, 1000, layerMask))
+            {
+                var drag = Input.mousePosition - mousePosition;
 
-            this.transform.RotateAround(lookAt, up, dragX * speed * Time.deltaTime);
-            this.transform.RotateAround(lookAt, this.transform.right, dragY * speed * Time.deltaTime);
-            this.transform.LookAt(lookAt);
+                var dragX = Mathf.Clamp(drag.x, -DRAG_CLAMP, DRAG_CLAMP);
+                var dragY = -Mathf.Clamp(drag.y, -DRAG_CLAMP, DRAG_CLAMP);
+
+                this.transform.RotateAround(lookAt, up, dragX * speed * Time.deltaTime);
+                this.transform.RotateAround(lookAt, this.transform.right, dragY * speed * Time.deltaTime);
+                this.transform.LookAt(lookAt);
+            }
         }
 
         mousePosition = Input.mousePosition;
