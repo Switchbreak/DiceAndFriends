@@ -12,6 +12,7 @@ public class ChessPiece : MonoBehaviour
     float speed = 0.1f;
 
     GameObject collisionPlane;
+    Vector3 offset = default;
 
     private void OnMouseDown()
     {
@@ -19,6 +20,13 @@ public class ChessPiece : MonoBehaviour
         collisionPlane.transform.localScale = new Vector3(COLLISION_PLANE_SIZE, COLLISION_PLANE_SIZE, COLLISION_PLANE_SIZE);
         collisionPlane.GetComponent<MeshRenderer>().enabled = false;
         collisionPlane.layer = COLLISION_PLANE_LAYER;
+
+        var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+
+        if (Physics.Raycast(ray, out var hitInfo, MAX_RAYCAST_DISTANCE, 1 << COLLISION_PLANE_LAYER))
+        {
+            offset = hitInfo.point - this.transform.position;
+        }
     }
 
     private void OnMouseDrag()
@@ -27,7 +35,7 @@ public class ChessPiece : MonoBehaviour
         
         if (Physics.Raycast(ray, out var hitInfo, MAX_RAYCAST_DISTANCE, 1 << COLLISION_PLANE_LAYER))
         {
-            var drag = hitInfo.point - this.transform.position;
+            var drag = hitInfo.point - offset - this.transform.position;
             this.transform.Translate(drag.x, 0, drag.z, Space.World);
         }
     }
