@@ -1261,6 +1261,7 @@ MonoBehaviour:
   lookAt: {x: 0, y: 0, z: 0}
   orbitSpeed: 50
   zoomSpeed: 2
+  panSpeed: 0.01
   pieceDragging: 0
 --- !u!1 &1909264343 stripped
 GameObject:

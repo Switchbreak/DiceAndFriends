@@ -6,6 +6,7 @@ using UnityEngine;
 public class OrbitCamera : MonoBehaviour
 {
     private const int LEFT_MOUSE_BUTTON = 0;
+    private const int MIDDLE_MOUSE_BUTTON = 2;
     private const int DRAG_CLAMP = 100;
 
     [SerializeField]
@@ -18,17 +19,17 @@ public class OrbitCamera : MonoBehaviour
     float zoomSpeed = 1;
 
     [SerializeField]
+    float panSpeed = 0.01f;
+
+    [SerializeField]
     public bool pieceDragging = false;
 
     Vector3 up = new(0, 1, 0);
     Vector3 mousePosition;
-    int layerMask;
 
     // Start is called before the first frame update
     void Start()
     {
-        layerMask = LayerMask.GetMask("Default", "UI");
-
         this.transform.LookAt(lookAt);
         mousePosition = Input.mousePosition;
     }
@@ -46,6 +47,15 @@ public class OrbitCamera : MonoBehaviour
             this.transform.RotateAround(lookAt, up, dragX * orbitSpeed * Time.deltaTime);
             this.transform.RotateAround(lookAt, this.transform.right, dragY * orbitSpeed * Time.deltaTime);
             this.transform.LookAt(lookAt);
+        }
+
+        if (Input.GetMouseButton(MIDDLE_MOUSE_BUTTON))
+        {
+            var drag = Input.mousePosition - mousePosition;
+
+            var panOffset = this.transform.position;
+            this.transform.transform.Translate(-drag * panSpeed, Space.Self);
+            lookAt += (this.transform.position - panOffset);
         }
 
         if (Input.mouseScrollDelta.y != 0)
