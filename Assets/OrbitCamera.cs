@@ -14,6 +14,9 @@ public class OrbitCamera : MonoBehaviour
     [SerializeField]
     float speed = 50;
 
+    [SerializeField]
+    public bool pieceDragging = false;
+
     Vector3 up = new(0, 1, 0);
     Vector3 mousePosition;
     int layerMask;
@@ -30,21 +33,16 @@ public class OrbitCamera : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetMouseButton(LEFT_MOUSE_BUTTON))
+        if (Input.GetMouseButton(LEFT_MOUSE_BUTTON) && !pieceDragging)
         {
-            var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            var drag = Input.mousePosition - mousePosition;
 
-            if (!Physics.Raycast(ray, 1000, layerMask))
-            {
-                var drag = Input.mousePosition - mousePosition;
+            var dragX = Mathf.Clamp(drag.x, -DRAG_CLAMP, DRAG_CLAMP);
+            var dragY = -Mathf.Clamp(drag.y, -DRAG_CLAMP, DRAG_CLAMP);
 
-                var dragX = Mathf.Clamp(drag.x, -DRAG_CLAMP, DRAG_CLAMP);
-                var dragY = -Mathf.Clamp(drag.y, -DRAG_CLAMP, DRAG_CLAMP);
-
-                this.transform.RotateAround(lookAt, up, dragX * speed * Time.deltaTime);
-                this.transform.RotateAround(lookAt, this.transform.right, dragY * speed * Time.deltaTime);
-                this.transform.LookAt(lookAt);
-            }
+            this.transform.RotateAround(lookAt, up, dragX * speed * Time.deltaTime);
+            this.transform.RotateAround(lookAt, this.transform.right, dragY * speed * Time.deltaTime);
+            this.transform.LookAt(lookAt);
         }
 
         mousePosition = Input.mousePosition;

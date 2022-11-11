@@ -27,6 +27,8 @@ public class ChessPiece : MonoBehaviour
         {
             offset = hitInfo.point - this.transform.position;
         }
+
+        Camera.main.GetComponent<OrbitCamera>()!.pieceDragging = true;
     }
 
     private void OnMouseDrag()
@@ -42,6 +44,7 @@ public class ChessPiece : MonoBehaviour
 
     private void OnMouseUp()
     {
+        Camera.main.GetComponent<OrbitCamera>()!.pieceDragging = false;
         Destroy(collisionPlane);
     }
 }
