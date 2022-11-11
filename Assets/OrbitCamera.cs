@@ -12,7 +12,10 @@ public class OrbitCamera : MonoBehaviour
     Vector3 lookAt = default;
 
     [SerializeField]
-    float speed = 50;
+    float orbitSpeed = 50;
+
+    [SerializeField]
+    float zoomSpeed = 1;
 
     [SerializeField]
     public bool pieceDragging = false;
@@ -40,9 +43,14 @@ public class OrbitCamera : MonoBehaviour
             var dragX = Mathf.Clamp(drag.x, -DRAG_CLAMP, DRAG_CLAMP);
             var dragY = -Mathf.Clamp(drag.y, -DRAG_CLAMP, DRAG_CLAMP);
 
-            this.transform.RotateAround(lookAt, up, dragX * speed * Time.deltaTime);
-            this.transform.RotateAround(lookAt, this.transform.right, dragY * speed * Time.deltaTime);
+            this.transform.RotateAround(lookAt, up, dragX * orbitSpeed * Time.deltaTime);
+            this.transform.RotateAround(lookAt, this.transform.right, dragY * orbitSpeed * Time.deltaTime);
             this.transform.LookAt(lookAt);
+        }
+
+        if (Input.mouseScrollDelta.y != 0)
+        {
+            this.GetComponent<Camera>().fieldOfView -= zoomSpeed * Input.mouseScrollDelta.y;
         }
 
         mousePosition = Input.mousePosition;

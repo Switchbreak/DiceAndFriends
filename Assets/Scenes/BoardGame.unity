@@ -1259,7 +1259,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   lookAt: {x: 0, y: 0, z: 0}
-  speed: 50
+  orbitSpeed: 50
+  zoomSpeed: 2
+  pieceDragging: 0
 --- !u!1 &1909264343 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: -2891241111271857795, guid: 9370b362e1709e848ac88d6df885c3e5,
