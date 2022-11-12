@@ -8,6 +8,8 @@ public class OrbitCamera : MonoBehaviour
     private const int RIGHT_MOUSE_BUTTON = 1;
     private const int MIDDLE_MOUSE_BUTTON = 2;
     private const int DRAG_CLAMP = 100;
+    private const int RAYCAST_MAX_DISTANCE = 1000;
+    private const int GAME_PIECES_LAYER = 6;
 
     [SerializeField]
     Vector3 lookAt = default;
@@ -56,7 +58,15 @@ public class OrbitCamera : MonoBehaviour
         // Orbit camera on single touch
         if (Input.touchCount == 1 && !pieceDragging)
         {
-            Orbit(Input.touches[0].deltaPosition, orbitTouchSpeed);
+            if (RaycastTouchPoint(Input.touches[0], out var hitInfo))
+            {
+                hitInfo.collider.GetComponent<ChessPiece>()!.TouchPiece(Input.touches[0]);
+                pieceDragging = true;
+            }
+            else
+            {
+                Orbit(Input.touches[0].deltaPosition, orbitTouchSpeed);
+            }
         }
 
         if (Input.touchCount == 2)
@@ -76,6 +86,18 @@ public class OrbitCamera : MonoBehaviour
                 Pan(averageDragVector, panTouchSpeed);
             }
         }
+    }
+
+    private bool RaycastTouchPoint(Touch touch, out RaycastHit hitInfo)
+    {
+        if (touch.phase != TouchPhase.Began)
+        {
+            hitInfo = default;
+            return false;
+        }
+
+        var ray = Camera.main.ScreenPointToRay(Input.touches[0].position);
+        return Physics.Raycast(ray, out hitInfo, RAYCAST_MAX_DISTANCE, 1 << GAME_PIECES_LAYER);
     }
 
     private void MouseInput()

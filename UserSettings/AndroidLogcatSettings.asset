@@ -3,7 +3,7 @@
     "m_SelectedPackage": {
         "deviceId": "18211JECB04844",
         "name": "com.Switchbreak.DiceAndFriends",
-        "processId": 3442,
+        "processId": 13060,
         "exited": false
     },
     "m_SelectedPriority": 0,
@@ -54,6 +54,18 @@
             "deviceId": "18211JECB04844",
             "name": "com.Switchbreak.DiceAndFriends",
             "processId": 3442,
+            "exited": false
+        },
+        {
+            "deviceId": "18211JECB04844",
+            "name": "com.Switchbreak.DiceAndFriends",
+            "processId": 4676,
+            "exited": false
+        },
+        {
+            "deviceId": "18211JECB04844",
+            "name": "com.Switchbreak.DiceAndFriends",
+            "processId": 13060,
             "exited": false
         }
     ],
