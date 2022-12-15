@@ -14,5 +14,7 @@ EditorBuildSettings:
       type: 2}
     com.unity.adaptiveperformance.simulator.provider_settings: {fileID: 11400000,
       guid: 70a4d29be8702954383ca6df86a96f9d, type: 2}
+    com.unity.xr.arfoundation.simulation_settings: {fileID: 11400000, guid: bc4d283de0ee38f438a4aeb25d32c7a7,
+      type: 2}
     com.unity.xr.management.loader_settings: {fileID: 11400000, guid: ea6bf60a8e1b59b458fbbfac3c838d53,
       type: 2}
