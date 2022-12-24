@@ -23,9 +23,13 @@ public class ARAnchorPlace : MonoBehaviour
     [SerializeField]
     Material tableBasisPlaneMaterial;
 
+    [SerializeField]
+    GameObject tabletop;
+
     ARAnchor anchor;
     ARPlane anchorPlane;
     GameObject tableBasis;
+    Vector3 tabletopStartPosition;
 
     void Awake()
     {
@@ -33,6 +37,8 @@ public class ARAnchorPlace : MonoBehaviour
         anchorManager = GetComponent<ARAnchorManager>();
         planeManager = GetComponent<ARPlaneManager>();
         sessionOrigin = GetComponent<Unity.XR.CoreUtils.XROrigin>();
+
+        tabletopStartPosition = tabletop.transform.position;
     }
 
     // Start is called before the first frame update
@@ -56,11 +62,39 @@ public class ARAnchorPlace : MonoBehaviour
             {
                 PlaceAnchorPoint();
             }
-            else if(anchor != null)
+            else if(anchor != null && Input.touches[0].phase == TouchPhase.Moved)
             {
                 SetTableBasis(Input.touches[0]);
             }
+            else if(anchor != null && tableBasis != null && Input.touches[0].phase == TouchPhase.Ended)
+            {
+                ShowTabletop();
+            }
         }
+    }
+
+    private void ShowTabletop()
+    {
+        tabletop.transform.parent = anchor.transform;
+        tabletop.transform.localScale = tableBasis.transform.localScale * 20;
+        tabletop.transform.position = tableBasis.transform.position;
+        tabletop.transform.eulerAngles = tableBasis.transform.eulerAngles;
+
+        // Correct position
+        var offset = tabletopStartPosition;
+        offset.Scale(tableBasis.transform.localScale);
+        tabletop.transform.Translate(offset, Space.Self);
+
+        // FIXME: Temp code, hide all game objects until the basis has been placed
+        var gameMeshes = FindObjectsOfType<MeshRenderer>();
+
+        foreach (var mesh in gameMeshes)
+        {
+            mesh.enabled = true;
+        }
+
+        tableBasis.GetComponent<MeshRenderer>().enabled = false;
+        anchor.gameObject.GetComponentInChildren<MeshRenderer>().enabled = false;
     }
 
     private void SetTableBasis(Touch touch)
@@ -129,6 +163,8 @@ public class ARAnchorPlace : MonoBehaviour
     {
         if (anchor != null)
         {
+            tabletop.transform.parent = null;
+
             Debug.Log("Destroying old anchor");
             Destroy(anchor);
             Destroy(anchor.gameObject);
