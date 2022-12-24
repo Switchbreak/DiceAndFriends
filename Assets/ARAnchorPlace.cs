@@ -117,15 +117,21 @@ public class ARAnchorPlace : MonoBehaviour
                 }
 
                 var worldSpacePose = sessionOrigin.TrackablesParent.TransformPose(hit.pose);
-
-                var scale = Vector3.Distance(anchor.transform.position, worldSpacePose.position);
+                float scale = GetScale(worldSpacePose);
                 float rotation = GetRotation(worldSpacePose.position);
 
                 tableBasis.transform.position = anchor.transform.position;
-                tableBasis.transform.localScale = Vector3.one * (scale / 10);
+                tableBasis.transform.localScale = Vector3.one * scale;
                 tableBasis.transform.eulerAngles = new Vector3(0, rotation + 45, 0);
             }
         }
+    }
+
+    private float GetScale(Pose worldSpacePose)
+    {
+        var scale = Vector3.Distance(anchor.transform.position, worldSpacePose.position);
+
+        return Mathf.Sqrt((scale * scale) / 2) / 5;
     }
 
     // This is a bit of a hack since it assumes that our two points must be on a perfectly horizontal plane, but it should work
