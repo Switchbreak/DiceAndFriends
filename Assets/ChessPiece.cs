@@ -8,9 +8,6 @@ public class ChessPiece : MonoBehaviour
     private const int COLLISION_PLANE_SIZE = 5;
     private const int COLLISION_PLANE_LAYER = 3;
 
-    [SerializeField]
-    float speed = 0.1f;
-
     GameObject collisionPlane;
     Vector3 offset = default;
     int? fingerId = null;
