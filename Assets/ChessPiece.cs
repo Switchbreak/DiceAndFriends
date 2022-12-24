@@ -1,6 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.XR.CoreUtils;
 using UnityEngine;
+using UnityEngine.UIElements;
+using UnityEngine.XR.ARFoundation;
 
 public class ChessPiece : MonoBehaviour
 {
@@ -8,9 +11,18 @@ public class ChessPiece : MonoBehaviour
     private const int COLLISION_PLANE_SIZE = 5;
     private const int COLLISION_PLANE_LAYER = 3;
 
+    ARAnchorPlace arInputManager;
+    OrbitCamera cameraInputManager;
+
     GameObject collisionPlane;
     Vector3 offset = default;
     int? fingerId = null;
+
+    private void Start()
+    {
+        arInputManager = FindObjectOfType<XROrigin>()?.GetComponent<ARAnchorPlace>();
+        cameraInputManager = Camera.main.GetComponent<OrbitCamera>();
+    }
 
     private void Update()
     {
@@ -28,25 +40,36 @@ public class ChessPiece : MonoBehaviour
 
             if (!touchFound)
             {
+                Debug.Log("Touch not found, ending drag");
                 DestroyCollisionPlane();
                 fingerId = null;
-                Camera.main.GetComponent<OrbitCamera>()!.pieceDragging = false;
+
+                // FIXME: Hack
+                arInputManager?.SetPieceDragging(false);
+                cameraInputManager?.SetPieceDragging(false);
             }
         }
     }
 
-    public void TouchPiece(Touch touch)
+    public void TouchPiece(Touch touch, RaycastHit hitInfo)
     {
-        CreateCollisionPlane();
-        GetOffset(touch.position);
+        Debug.Log($"Piece {gameObject.name} touched");
+
+        CreateCollisionPlane(hitInfo);
+        GetOffset(hitInfo);
 
         fingerId = touch.fingerId;
     }
 
     private void OnMouseDown()
     {
-        CreateCollisionPlane();
-        GetOffset(Input.mousePosition);
+        var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+
+        if (Physics.Raycast(ray, out var hitInfo, MAX_RAYCAST_DISTANCE, 1 << COLLISION_PLANE_LAYER))
+        {
+            CreateCollisionPlane(hitInfo);
+            GetOffset(hitInfo);
+        }
     }
 
     private void OnMouseDrag()
@@ -56,11 +79,14 @@ public class ChessPiece : MonoBehaviour
 
     private void OnMouseUp()
     {
-        Camera.main.GetComponent<OrbitCamera>()!.pieceDragging = false;
+        // FIXME: Hack
+        arInputManager?.SetPieceDragging(false);
+        cameraInputManager?.SetPieceDragging(false);
+
         DestroyCollisionPlane();
     }
 
-    private void CreateCollisionPlane()
+    private void CreateCollisionPlane(RaycastHit hitInfo)
     {
         if (collisionPlane != null)
         {
@@ -69,10 +95,14 @@ public class ChessPiece : MonoBehaviour
 
         collisionPlane = GameObject.CreatePrimitive(PrimitiveType.Plane);
         collisionPlane.transform.localScale = new Vector3(COLLISION_PLANE_SIZE, COLLISION_PLANE_SIZE, COLLISION_PLANE_SIZE);
+        collisionPlane.transform.position = hitInfo.point;
+
         collisionPlane.GetComponent<MeshRenderer>().enabled = false;
         collisionPlane.layer = COLLISION_PLANE_LAYER;
 
-        Camera.main.GetComponent<OrbitCamera>()!.pieceDragging = true;
+        // FIXME: Hack
+        arInputManager?.SetPieceDragging(true);
+        cameraInputManager?.SetPieceDragging(true);
     }
 
     private void DestroyCollisionPlane()
@@ -81,14 +111,9 @@ public class ChessPiece : MonoBehaviour
         collisionPlane = null;
     }
 
-    private void GetOffset(Vector3 position)
+    private void GetOffset(RaycastHit hitInfo)
     {
-        var ray = Camera.main.ScreenPointToRay(position);
-
-        if (Physics.Raycast(ray, out var hitInfo, MAX_RAYCAST_DISTANCE, 1 << COLLISION_PLANE_LAYER))
-        {
-            offset = hitInfo.point - this.transform.position;
-        }
+        offset = hitInfo.point - this.transform.position;
     }
 
     private void DragPiece(Vector3 position)

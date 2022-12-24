@@ -1501,7 +1501,7 @@ PrefabInstance:
     - target: {fileID: -4592863607052874063, guid: 9370b362e1709e848ac88d6df885c3e5,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0.186
+      value: 0.2427
       objectReference: {fileID: 0}
     - target: {fileID: -4592863607052874063, guid: 9370b362e1709e848ac88d6df885c3e5,
         type: 3}
@@ -2191,7 +2191,12 @@ PrefabInstance:
     - target: {fileID: 3263594610882740856, guid: 9370b362e1709e848ac88d6df885c3e5,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0.246
+      value: 0.1886
+      objectReference: {fileID: 0}
+    - target: {fileID: 3263594610882740856, guid: 9370b362e1709e848ac88d6df885c3e5,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -0.0036
       objectReference: {fileID: 0}
     - target: {fileID: 3263594610882740856, guid: 9370b362e1709e848ac88d6df885c3e5,
         type: 3}
@@ -3684,6 +3689,8 @@ MonoBehaviour:
   tableBasisPlaneMaterial: {fileID: 2100000, guid: 2da0ea038f25a4fa998f183878aedf79,
     type: 2}
   tabletop: {fileID: 495192784}
+  tablePlaced: 0
+  pieceDragging: 0
 --- !u!114 &1917189088
 MonoBehaviour:
   m_ObjectHideFlags: 0

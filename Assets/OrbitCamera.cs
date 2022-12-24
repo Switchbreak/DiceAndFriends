@@ -60,7 +60,7 @@ public class OrbitCamera : MonoBehaviour
         {
             if (RaycastTouchPoint(Input.touches[0], out var hitInfo))
             {
-                hitInfo.collider.GetComponent<ChessPiece>()!.TouchPiece(Input.touches[0]);
+                hitInfo.collider.GetComponent<ChessPiece>()?.TouchPiece(Input.touches[0], hitInfo);
                 pieceDragging = true;
             }
             else
@@ -137,5 +137,10 @@ public class OrbitCamera : MonoBehaviour
         this.transform.RotateAround(lookAt, Vector3.up, dragX * orbitSpeed);
         this.transform.RotateAround(lookAt, this.transform.right, dragY * orbitSpeed);
         this.transform.LookAt(lookAt);
+    }
+
+    public void SetPieceDragging(bool isDragging)
+    {
+        pieceDragging = isDragging;
     }
 }

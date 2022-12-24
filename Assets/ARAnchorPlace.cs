@@ -13,6 +13,9 @@ using UnityEngine.XR.ARSubsystems;
 [RequireComponent(typeof(ARPlaneManager))]
 public class ARAnchorPlace : MonoBehaviour
 {
+    private const int RAYCAST_MAX_DISTANCE = 1000;
+    private const int GAME_PIECES_LAYER = 6;
+
     static List<ARRaycastHit> hits = new List<ARRaycastHit>();
 
     ARRaycastManager raycastManager;
@@ -30,6 +33,9 @@ public class ARAnchorPlace : MonoBehaviour
     ARPlane anchorPlane;
     GameObject tableBasis;
     Vector3 tabletopStartPosition;
+
+    public bool tablePlaced = false;
+    public bool pieceDragging = false;
 
     void Awake()
     {
@@ -58,19 +64,41 @@ public class ARAnchorPlace : MonoBehaviour
     {
         if (Input.touchCount == 1)
         {
-            if (Input.touches[0].phase == TouchPhase.Began)
+            if (!tablePlaced)
             {
-                PlaceAnchorPoint();
+                if (Input.touches[0].phase == TouchPhase.Began)
+                {
+                    PlaceAnchorPoint();
+                }
+                else if (anchor != null && Input.touches[0].phase == TouchPhase.Moved)
+                {
+                    SetTableBasis(Input.touches[0]);
+                }
+                else if (anchor != null && tableBasis != null && Input.touches[0].phase == TouchPhase.Ended)
+                {
+                    ShowTabletop();
+                }
             }
-            else if(anchor != null && Input.touches[0].phase == TouchPhase.Moved)
+            else if (!pieceDragging)
             {
-                SetTableBasis(Input.touches[0]);
-            }
-            else if(anchor != null && tableBasis != null && Input.touches[0].phase == TouchPhase.Ended)
-            {
-                ShowTabletop();
+                if (RaycastTouchPoint(Input.touches[0], out var hitInfo))
+                {
+                    hitInfo.collider.GetComponent<ChessPiece>()?.TouchPiece(Input.touches[0], hitInfo);
+                    pieceDragging = true;
+                }
             }
         }
+    }
+    private bool RaycastTouchPoint(Touch touch, out RaycastHit hitInfo)
+    {
+        if (touch.phase != TouchPhase.Began)
+        {
+            hitInfo = default;
+            return false;
+        }
+
+        var ray = Camera.main.ScreenPointToRay(Input.touches[0].position);
+        return Physics.Raycast(ray, out hitInfo, RAYCAST_MAX_DISTANCE, 1 << GAME_PIECES_LAYER);
     }
 
     private void ShowTabletop()
@@ -95,6 +123,8 @@ public class ARAnchorPlace : MonoBehaviour
 
         tableBasis.GetComponent<MeshRenderer>().enabled = false;
         anchor.gameObject.GetComponentInChildren<MeshRenderer>().enabled = false;
+
+        tablePlaced = true;
     }
 
     private void SetTableBasis(Touch touch)
@@ -122,7 +152,7 @@ public class ARAnchorPlace : MonoBehaviour
 
                 tableBasis.transform.position = anchor.transform.position;
                 tableBasis.transform.localScale = Vector3.one * scale;
-                tableBasis.transform.eulerAngles = new Vector3(0, rotation + 45, 0);
+                tableBasis.transform.eulerAngles = Vector3.up * (rotation + 45);
             }
         }
     }
@@ -184,5 +214,10 @@ public class ARAnchorPlace : MonoBehaviour
             Destroy(tableBasis);
             tableBasis = null;
         }
+    }
+
+    public void SetPieceDragging(bool isDragging)
+    {
+        pieceDragging = isDragging;
     }
 }
